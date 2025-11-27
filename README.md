@@ -1,0 +1,29 @@
+# atmos_native_ss14
+
+C++ library for atmosphere processing in Space Station 14.
+
+think twice before diving in.
+
+## advantages
+
+- SIMD
+- tiles stored contiguously in memory
+- multithreaded processing
+
+## risks
+
+- 10–20% overhead for data copying
+- harder to debug
+- possible floating-point desync
+
+## performance
+
+2–5× faster than the managed implementation on large atmospheric events (tested on SS14 stable branch).
+
+## how to use
+
+- Create your own atmos manager to handle simulation/syncing/convertion.
+- See [AtmosNative.cs](https://github.com/rhailrake/atmos_native_ss14/blob/master/AtmosNative.cs) for more.
+- Replace default ss14 atmos calls to your atmos manager.
+- Make sure that SS14 atmos data matches the format expected by the library.
+- Fix any debug asserts.
