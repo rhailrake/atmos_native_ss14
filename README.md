@@ -24,7 +24,7 @@ Use this only if the map contains more than 5,000 tiles. Otherwise, use the defa
 ## how to use
 
 - Create your own atmos manager to handle simulation/syncing/convertion.
-- See [AtmosNative.cs](https://github.com/rhailrake/atmos_native_ss14/blob/master/AtmosNative.cs) for more.
+- See [AtmosNative.cs](https://github.com/rhailrake/atmos_native_ss14/blob/master/res/AtmosNative.cs) for more.
 - Replace default ss14 atmos calls to your atmos manager.
 - Make sure that SS14 atmos data matches the format expected by the library.
 - Fix any debug asserts.
