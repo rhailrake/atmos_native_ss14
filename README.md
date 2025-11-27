@@ -19,6 +19,7 @@ think twice before diving in.
 ## performance
 
 2–5× faster than the managed implementation on large atmospheric events (tested on SS14 stable branch).
+Use this only if the map contains more than 5,000 tiles. Otherwise, use the default SS14 atmos.
 
 ## how to use
 
