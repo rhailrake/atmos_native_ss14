@@ -4,8 +4,6 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-env:
-  SCCACHE_GHA_ENABLED: "true"
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -45,13 +43,6 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
 
-      - name: Restore vcpkg Cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/vcpkg/
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: ${{ runner.os }}-vcpkg-
-
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
 
@@ -61,23 +52,11 @@ jobs:
         run: |
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-      - name: Restore Build Directory
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.strings.outputs.build-output-dir }}
-          key: ${{ runner.os }}-build-${{ matrix.cpp_compiler }}-${{ hashfiles('CMakeLists.txt') }}
-          restore-keys: ${{ runner.os }}-build-${{ matrix.cpp_compiler }}-
-
-      - name: Setup sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
-
       - name: Configure CMake
         run: >
           cmake -B ${{ steps.strings.outputs.build-output-dir }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-          -DCMAKE_C_COMPILER_LAUNCHER=sccache
-          -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
           -DGLFW_BUILD_WAYLAND=OFF
@@ -87,7 +66,7 @@ jobs:
       - name: Build
         run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-      - name: Upload MapEditor artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: map-editor-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
