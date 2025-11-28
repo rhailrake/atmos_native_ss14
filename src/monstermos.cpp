@@ -5,9 +5,9 @@
 static void finalize_eq_neighbors(GridAtmosState* state, int32_t tileIndex, const float* transferDirs, const AtmosConfig* config);
 
 static TileAtmosData* s_equalizeTiles[2000];
-static TileAtmosData* s_equalizeGiverTiles[200];
-static TileAtmosData* s_equalizeTakerTiles[200];
-static TileAtmosData* s_equalizeQueue[200];
+static TileAtmosData* s_equalizeGiverTiles[2000];
+static TileAtmosData* s_equalizeTakerTiles[2000];
+static TileAtmosData* s_equalizeQueue[2000];
 static TileAtmosData* s_depressurizeTiles[2000];
 static TileAtmosData* s_depressurizeSpaceTiles[2000];
 static TileAtmosData* s_depressurizeProgressionOrder[4000];
@@ -405,9 +405,8 @@ void equalize_pressure_in_zone(GridAtmosState* state, int32_t startTileIndex, co
     }
 
     for (int i = 0; i < 2000; i++)
-        s_equalizeTiles[i] = nullptr;
-    for (int i = 0; i < 200; i++)
     {
+        s_equalizeTiles[i] = nullptr;
         s_equalizeGiverTiles[i] = nullptr;
         s_equalizeTakerTiles[i] = nullptr;
         s_equalizeQueue[i] = nullptr;
@@ -671,17 +670,26 @@ void finalize_eq(GridAtmosState* state, int32_t tileIndex, const AtmosConfig* co
 
         if (!(tile->flags & TILE_FLAG_IMMUTABLE) && !(otherTile->flags & TILE_FLAG_IMMUTABLE))
         {
+            float transferMoles[ATMOS_GAS_ARRAY_SIZE] = {0};
             for (int g = 0; g < ATMOS_GAS_COUNT; g++)
             {
                 float transfer = tile->moles[g] * ratio;
+                transferMoles[g] = transfer;
                 tile->moles[g] -= transfer;
                 otherTile->moles[g] += transfer;
             }
 
-            merge_impl(otherTile, tile->moles, tile->temperature,
-                      config->gasSpecificHeats,
-                      config->constants.minimumTemperatureDeltaToConsider,
-                      config->constants.minimumHeatCapacity);
+            float tempDelta = simd_abs(tile->temperature - otherTile->temperature);
+            if (tempDelta > config->constants.minimumTemperatureDeltaToConsider)
+            {
+                float transferHC = simd_dot_product(transferMoles, config->gasSpecificHeats, ATMOS_GAS_ARRAY_SIZE);
+                float otherHC = get_heat_capacity_impl(otherTile->moles, config->gasSpecificHeats, false);
+                if (otherHC > config->constants.minimumHeatCapacity && transferHC > 0)
+                {
+                    float combinedEnergy = otherTile->temperature * (otherHC - transferHC) + tile->temperature * transferHC;
+                    otherTile->temperature = combinedEnergy / otherHC;
+                }
+            }
         }
 
         consider_pressure_difference(state, tileIndex, i, amount);

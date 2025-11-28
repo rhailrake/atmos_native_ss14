@@ -79,6 +79,7 @@ struct ExcitedGroupData
     int32_t breakdownCooldown;
     int32_t dismantleCooldown;
     int32_t tileCount;
+    int32_t tileCapacity;
     int32_t* tileIndices;
     uint8_t disposed;
     uint8_t padding[3];

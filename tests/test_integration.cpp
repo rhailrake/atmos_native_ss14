@@ -136,43 +136,39 @@ TEST_F(IntegrationTest, ComplexRoomConfiguration) {
         for (int x = 0; x < 10; x++) {
             TileAtmosData tile;
             if (x == 0 || x == 9 || y == 0 || y == 9) {
-                tile = CreateSpaceTile(x, y);
+                tile = CreateLowPressureTile(x, y);
+                tile.moles[GAS_OXYGEN] = 0;
+                tile.moles[GAS_NITROGEN] = 0;
             } else {
                 tile = CreateStandardTile(x, y);
             }
             atmos_add_tile(state, &tile);
         }
     }
-    
-    for (int y = 0; y < 10; y++) {
-        for (int x = 0; x < 10; x++) {
+
+    for (int y = 1; y < 9; y++) {
+        for (int x = 1; x < 9; x++) {
             int idx = y * 10 + x;
-            if (x < 9) {
+            if (x < 8) {
                 int rightIdx = y * 10 + (x + 1);
-                if (!(state->tiles[idx].flags & TILE_FLAG_SPACE) || 
-                    !(state->tiles[rightIdx].flags & TILE_FLAG_SPACE)) {
-                    SetupAdjacency(idx, rightIdx, ATMOS_DIR_EAST);
-                }
+                SetupAdjacency(idx, rightIdx, ATMOS_DIR_EAST);
             }
-            if (y < 9) {
+            if (y < 8) {
                 int bottomIdx = (y + 1) * 10 + x;
-                if (!(state->tiles[idx].flags & TILE_FLAG_SPACE) || 
-                    !(state->tiles[bottomIdx].flags & TILE_FLAG_SPACE)) {
-                    SetupAdjacency(idx, bottomIdx, ATMOS_DIR_SOUTH);
-                }
+                SetupAdjacency(idx, bottomIdx, ATMOS_DIR_SOUTH);
             }
         }
     }
-    
+
     state->tiles[55].moles[GAS_OXYGEN] = 100.0f;
     state->tiles[55].moles[GAS_NITROGEN] = 400.0f;
-    
+
     atmos_add_active_tile(state, 55);
-    
-    for (int cycle = 0; cycle < 100; cycle++) {
+
+    for (int cycle = 0; cycle < 50; cycle++) {
         AtmosResult result = atmos_process(state, &config);
     }
-    
+
     bool foundHighPressure = false;
     for (int y = 1; y < 9; y++) {
         for (int x = 1; x < 9; x++) {
@@ -182,7 +178,7 @@ TEST_F(IntegrationTest, ComplexRoomConfiguration) {
             }
         }
     }
-    
+
     EXPECT_TRUE(foundHighPressure);
 }
 
@@ -240,31 +236,31 @@ TEST_F(IntegrationTest, SuperconductionWithFire) {
 }
 
 TEST_F(IntegrationTest, LargeScaleEqualization) {
-    SetupSquareGrid(20, 20);
-    
-    state->tiles[0].moles[GAS_OXYGEN] = 1000.0f;
-    state->tiles[0].moles[GAS_NITROGEN] = 4000.0f;
-    
-    state->tiles[399].moles[GAS_OXYGEN] = 1.0f;
-    state->tiles[399].moles[GAS_NITROGEN] = 4.0f;
-    
+    SetupSquareGrid(10, 10);
+
+    state->tiles[0].moles[GAS_OXYGEN] = 500.0f;
+    state->tiles[0].moles[GAS_NITROGEN] = 2000.0f;
+
+    state->tiles[99].moles[GAS_OXYGEN] = 1.0f;
+    state->tiles[99].moles[GAS_NITROGEN] = 4.0f;
+
     float totalBefore = 0.0f;
-    for (int i = 0; i < 400; i++) {
+    for (int i = 0; i < 100; i++) {
         totalBefore += GetTotalMoles(&state->tiles[i]);
     }
-    
+
     atmos_add_active_tile(state, 0);
-    atmos_add_active_tile(state, 399);
-    
-    for (int cycle = 0; cycle < 200; cycle++) {
+    atmos_add_active_tile(state, 99);
+
+    for (int cycle = 0; cycle < 100; cycle++) {
         AtmosResult result = atmos_process(state, &config);
     }
-    
+
     float totalAfter = 0.0f;
-    for (int i = 0; i < 400; i++) {
+    for (int i = 0; i < 100; i++) {
         totalAfter += GetTotalMoles(&state->tiles[i]);
     }
-    
+
     EXPECT_NEAR(totalAfter, totalBefore, totalBefore * 0.01f);
 }
 

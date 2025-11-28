@@ -161,14 +161,17 @@ TEST_F(LindaTest, TemperatureShareConservesEnergy) {
 
 TEST_F(LindaTest, ProcessCellActivatesNeighbors) {
     SetupLinearGrid(3);
-    
+
+    config.monstermosEnabled = 0;
+    config.excitedGroupsEnabled = 0;
+
     state->tiles[0].moles[GAS_OXYGEN] = 100.0f;
     state->tiles[0].moles[GAS_NITROGEN] = 400.0f;
-    
+
     atmos_add_active_tile(state, 0);
-    
+
     AtmosResult result = atmos_process_active_tiles(state, &config);
-    
+
     EXPECT_GT(result.activeTilesCount, 1);
 }
 

@@ -93,14 +93,14 @@ TEST_F(HotspotTest, ProcessHotspotBurnsPlasma) {
 TEST_F(HotspotTest, HotspotExtinguishesWithoutFuel) {
     TileAtmosData tile = CreateStandardTile(0, 0);
     int32_t idx = atmos_add_tile(state, &tile);
-    
+
     state->tiles[idx].flags |= TILE_FLAG_HOTSPOT;
-    state->tiles[idx].hotspotTemperature = 500.0f;
+    state->tiles[idx].hotspotTemperature = config.constants.fireMinimumTemperatureToExist + 2.0f;
     state->tiles[idx].hotspotVolume = 100.0f;
     state->hotspotTiles[state->hotspotTileCount++] = idx;
-    
+
     atmos_process_hotspots(state, &config);
-    
+
     EXPECT_FALSE(state->tiles[idx].flags & TILE_FLAG_HOTSPOT);
 }
 

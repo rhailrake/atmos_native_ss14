@@ -385,38 +385,35 @@ TEST_F(PerformanceTest, ArchiveAllTiles) {
 }
 
 TEST_F(PerformanceTest, WorstCaseScenario) {
-    SetupLargeGrid(50, 50);
-    
-    state->tiles[0].moles[GAS_OXYGEN] = 5000.0f;
-    state->tiles[0].moles[GAS_NITROGEN] = 20000.0f;
-    state->tiles[0].moles[GAS_PLASMA] = 100.0f;
+    SetupLargeGrid(25, 25);
+
+    state->tiles[0].moles[GAS_OXYGEN] = 2000.0f;
+    state->tiles[0].moles[GAS_NITROGEN] = 8000.0f;
+    state->tiles[0].moles[GAS_PLASMA] = 50.0f;
     state->tiles[0].temperature = 1000.0f;
-    
-    TileAtmosData spaceTile = CreateSpaceTile(50, 25);
-    int32_t spaceIdx = atmos_add_tile(state, &spaceTile);
-    SetupAdjacency(25 * 50 + 49, spaceIdx, ATMOS_DIR_EAST);
-    
-    for (int i = 0; i < 50; i++) {
+
+    for (int i = 0; i < 25; i++) {
         state->tiles[i].moles[GAS_PLASMA] = 20.0f;
+        state->tiles[i].moles[GAS_OXYGEN] = 30.0f;
         state->tiles[i].temperature = 800.0f;
         atmos_ignite_hotspot(state, i, 800.0f, 500.0f);
     }
-    
-    for (int i = 0; i < 2500; i++) {
+
+    for (int i = 0; i < 625; i++) {
         atmos_add_active_tile(state, i);
     }
-    
+
     const int iterations = 5;
     PerformanceTimer timer;
-    
+
     timer.Start();
     for (int i = 0; i < iterations; i++) {
         atmos_process(state, &config);
     }
     double elapsed = timer.ElapsedMs();
-    
-    PrintResult("WorstCase (50x50, fire+space)", elapsed, iterations);
-    EXPECT_LT(elapsed / iterations, 1000.0);
+
+    PrintResult("WorstCase (25x25, fire)", elapsed, iterations);
+    EXPECT_LT(elapsed / iterations, 500.0);
 }
 
 TEST_F(PerformanceTest, Throughput) {

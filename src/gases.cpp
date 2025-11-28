@@ -24,7 +24,7 @@ float get_heat_capacity_archived_impl(const TileAtmosData* tile, const float* sp
     }
 
     float heatCapacity = simd_dot_product(tile->molesArchived, specificHeats, ATMOS_GAS_ARRAY_SIZE);
-    return simd_max(heatCapacity, tile->heatCapacity);
+    return simd_max(heatCapacity, 0.0003f);
 }
 
 float get_thermal_energy_impl(const TileAtmosData* tile, const float* specificHeats)
@@ -204,7 +204,10 @@ int32_t create_excited_group(GridAtmosState* state)
             group->disposed = 0;
 
             if (!group->tileIndices)
+            {
+                group->tileCapacity = 64;
                 group->tileIndices = (int32_t*)malloc(64 * sizeof(int32_t));
+            }
 
             if (i >= state->excitedGroupCount)
                 state->excitedGroupCount = i + 1;
@@ -227,6 +230,13 @@ void add_tile_to_excited_group(GridAtmosState* state, int32_t groupId, int32_t t
 
     TileAtmosData* tile = &state->tiles[tileIndex];
     tile->excitedGroupId = groupId;
+
+    if (group->tileCount >= group->tileCapacity)
+    {
+        int32_t newCapacity = group->tileCapacity * 2;
+        group->tileIndices = (int32_t*)realloc(group->tileIndices, newCapacity * sizeof(int32_t));
+        group->tileCapacity = newCapacity;
+    }
 
     group->tileIndices[group->tileCount++] = tileIndex;
 }
@@ -267,6 +277,16 @@ void merge_excited_groups(GridAtmosState* state, int32_t group1, int32_t group2)
 
     if (g1->disposed || g2->disposed)
         return;
+
+    int32_t neededCapacity = g1->tileCount + g2->tileCount;
+    if (neededCapacity > g1->tileCapacity)
+    {
+        int32_t newCapacity = g1->tileCapacity;
+        while (newCapacity < neededCapacity)
+            newCapacity *= 2;
+        g1->tileIndices = (int32_t*)realloc(g1->tileIndices, newCapacity * sizeof(int32_t));
+        g1->tileCapacity = newCapacity;
+    }
 
     for (int i = 0; i < g2->tileCount; i++)
     {

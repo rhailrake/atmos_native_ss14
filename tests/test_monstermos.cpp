@@ -49,26 +49,24 @@ TEST_F(MonstermosTest, EqualizePressureZoneHighToLow) {
 
 TEST_F(MonstermosTest, EqualizePressureMultipleCycles) {
     SetupLinearGrid(10);
-    
+
     state->tiles[0].moles[GAS_OXYGEN] = 500.0f;
     state->tiles[0].moles[GAS_NITROGEN] = 2000.0f;
-    
+
     for (int cycle = 0; cycle < 20; cycle++) {
         state->updateCounter++;
-        
         for (int i = 0; i < 10; i++) {
-            if (state->tiles[i].flags & TILE_FLAG_EXCITED) {
-                atmos_equalize_pressure_zone(state, i, &config);
-            }
+            state->tiles[i].lastCycle = 0;
         }
+        atmos_equalize_pressure_zone(state, 0, &config);
     }
-    
+
     float avgMoles = 0.0f;
     for (int i = 0; i < 10; i++) {
         avgMoles += GetTotalMoles(&state->tiles[i]);
     }
     avgMoles /= 10.0f;
-    
+
     for (int i = 0; i < 10; i++) {
         EXPECT_NEAR(GetTotalMoles(&state->tiles[i]), avgMoles, avgMoles * 0.3f);
     }
