@@ -38,21 +38,6 @@ set(SOURCES
         src/gases.cpp
 )
 
-
-# ═══════════════════════════════════════════════════════════════════════════════════════════════════
-# Library Target
-# ═══════════════════════════════════════════════════════════════════════════════════════════════════
-
-add_library(atmos_native SHARED ${SOURCES})
-
-target_include_directories(atmos_native PUBLIC include)
-
-set_target_properties(atmos_native PROPERTIES
-        PREFIX ""
-        OUTPUT_NAME "atmos_native"
-)
-
-
 # ═══════════════════════════════════════════════════════════════════════════════════════════════════
 # Output Directories
 # ═══════════════════════════════════════════════════════════════════════════════════════════════════
@@ -69,6 +54,19 @@ if(CMAKE_CONFIGURATION_TYPES)
         set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFGU} ${CMAKE_BINARY_DIR}/lib)
     endforeach()
 endif()
+
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════
+# Library Target
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════
+
+add_library(atmos_native SHARED ${SOURCES})
+
+target_include_directories(atmos_native PUBLIC include)
+
+set_target_properties(atmos_native PROPERTIES
+        PREFIX ""
+        OUTPUT_NAME "atmos_native"
+)
 
 # ═══════════════════════════════════════════════════════════════════════════════════════════════════
 # Tests
