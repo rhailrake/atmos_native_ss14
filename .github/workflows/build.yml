@@ -61,15 +61,20 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
           -DGLFW_BUILD_WAYLAND=OFF
           -DGLFW_BUILD_X11=ON
+          -DBUILD_TESTS=ON
           -S ${{ github.workspace }}
 
       - name: Build
         run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
+      - name: Run tests
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: ctest -C ${{ matrix.build_type }} --output-on-failure --verbose
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: map-editor-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
+          name: atmos-native-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
           path: |
             ${{ steps.strings.outputs.build-output-dir }}/bin/
             ${{ steps.strings.outputs.build-output-dir }}/lib/
