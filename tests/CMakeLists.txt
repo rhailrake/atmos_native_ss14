@@ -4,6 +4,7 @@ set(TEST_SOURCES
         test_monstermos.cpp
         test_hotspot.cpp
         test_superconductivity.cpp
+        test_reactions.cpp
         test_integration.cpp
         test_performance.cpp
         test_simd.cpp
