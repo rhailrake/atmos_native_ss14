@@ -380,24 +380,9 @@ ATMOS_API void atmos_ignite_hotspot(GridAtmosState* state, int32_t tileIndex, fl
 {
     if (!state || tileIndex < 0 || tileIndex >= state->tileCount) return;
 
-    TileAtmosData* tile = &state->tiles[tileIndex];
-    tile->hotspotTemperature = temperature;
-    tile->hotspotVolume = volume;
-    tile->flags |= TILE_FLAG_HOTSPOT;
-
-    bool found = false;
-    for (int i = 0; i < state->hotspotTileCount; i++)
-    {
-        if (state->hotspotTiles[i] == tileIndex)
-        {
-            found = true;
-            break;
-        }
-    }
-    if (!found)
-    {
-        state->hotspotTiles[state->hotspotTileCount++] = tileIndex;
-    }
+    AtmosConfig config;
+    atmos_config_init_default(&config);
+    ignite_hotspot_impl(state, tileIndex, temperature, volume, &config);
 }
 
 ATMOS_API void atmos_extinguish_hotspot(GridAtmosState* state, int32_t tileIndex)

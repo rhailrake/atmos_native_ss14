@@ -2,17 +2,15 @@
 
 C++ library for atmosphere processing in Space Station 14.
 
-think twice before diving in.
-
 ## advantages
 
 - SIMD
 - tiles stored contiguously in memory
 - multithreaded processing
+- tests
 
 ## risks
 
-- 10–20% overhead for data copying
 - harder to debug
 - possible floating-point desync
 
@@ -25,6 +23,6 @@ Use this only if the map contains more than 5,000 tiles. Otherwise, use the defa
 
 - Create your own atmos manager to handle simulation/syncing/convertion.
 - See [AtmosNative.cs](https://github.com/rhailrake/atmos_native_ss14/blob/master/res/AtmosNative.cs) for more.
-- Replace default ss14 atmos calls to your atmos manager.
+- Replace default SS14 atmos calls to your atmos manager.
 - Make sure that SS14 atmos data matches the format expected by the library.
 - Fix any debug asserts.

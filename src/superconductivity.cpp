@@ -111,7 +111,7 @@ void neighbor_conduct_with_source(GridAtmosState* state, int32_t tileIndex, int3
     {
         if (otherHasAir)
         {
-            temperature_share_solid(other, tile->thermalConductivity, tile->temperature, tile->heatCapacity, config);
+            tile->temperature = temperature_share_solid(other, tile->thermalConductivity, tile->temperature, tile->heatCapacity, config);
         }
         else
         {
