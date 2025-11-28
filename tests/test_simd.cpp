@@ -251,7 +251,8 @@ TEST_F(SIMDTest, PerformanceComparison) {
     }
     double scalarTime = timer.ElapsedMs();
     
-    EXPECT_NEAR(simdResult, scalarResult, 1.0f);
+    EXPECT_NEAR((float)simdResult, (float)scalarResult, 1.0f);
+    std::cout << "SIMD time: " << simdTime << " ms, Scalar time: " << scalarTime << " ms" << std::endl;
 }
 
 TEST_F(SIMDTest, EdgeCaseSingleElement) {
