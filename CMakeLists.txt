@@ -31,3 +31,11 @@ set_target_properties(atmos_native PROPERTIES
         PREFIX ""
         OUTPUT_NAME "atmos_native"
 )
+
+option(BUILD_TESTS "Build unit tests" ON)
+
+if(BUILD_TESTS)
+    enable_testing()
+    find_package(GTest CONFIG REQUIRED)
+    add_subdirectory(tests)
+endif()
