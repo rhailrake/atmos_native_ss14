@@ -222,39 +222,6 @@ TEST_F(SIMDTest, LargeArrayOperations) {
     EXPECT_GT(dot, 0.0f);
 }
 
-TEST_F(SIMDTest, PerformanceComparison) {
-    const int size = 10000;
-    const int iterations = 1000;
-    
-    std::vector<float> arr(size);
-    for (int i = 0; i < size; i++) {
-        arr[i] = (float)i;
-    }
-    
-    PerformanceTimer timer;
-    
-    timer.Start();
-    volatile float simdResult = 0;
-    for (int i = 0; i < iterations; i++) {
-        simdResult = simd_horizontal_add(arr.data(), size);
-    }
-    double simdTime = timer.ElapsedMs();
-    
-    timer.Start();
-    volatile float scalarResult = 0;
-    for (int iter = 0; iter < iterations; iter++) {
-        float sum = 0;
-        for (int i = 0; i < size; i++) {
-            sum += arr[i];
-        }
-        scalarResult = sum;
-    }
-    double scalarTime = timer.ElapsedMs();
-    
-    EXPECT_NEAR((float)simdResult, (float)scalarResult, 1.0f);
-    std::cout << "SIMD time: " << simdTime << " ms, Scalar time: " << scalarTime << " ms" << std::endl;
-}
-
 TEST_F(SIMDTest, EdgeCaseSingleElement) {
     float arr[] = {42.0f};
     

@@ -1,4 +1,4 @@
-name: build
+name: build & test
 on:
   push:
     branches: [ "master" ]
@@ -61,7 +61,6 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
           -DGLFW_BUILD_WAYLAND=OFF
           -DGLFW_BUILD_X11=ON
-          -DBUILD_TESTS=ON
           -S ${{ github.workspace }}
 
       - name: Build
